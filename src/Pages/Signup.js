@@ -8,14 +8,17 @@ import validateForm from "../validation";
 function SignupForm() {
   const navigator = useNavigate();
   const { toggleTheme } = useSignupForm();
-  const [userName, setUserName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [country, setCountry] = useState("");
+  const INITIAL_STATE = {
+    userName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    country: "",
+  };
+  const [formData, setFormData] = useState(INITIAL_STATE);
   const [countries, setCountries] = useState([]);
   const [errorMesssages, setErrorMessages] = useState(defaultErrors);
-  const { countryName } = useDebounce(country);
+  const { countryName } = useDebounce(formData.country);
 
   async function getCountriesData(countryName) {
     if (countryName) {
@@ -32,24 +35,28 @@ function SignupForm() {
     getCountriesData(countryName);
   }, [countryName]);
 
+  function handleInputChange(e) {
+    const { name, value } = e.target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
+  }
+
   function handleSubmit(e) {
     e.preventDefault();
     setErrorMessages(defaultErrors);
     const errors = validateForm(
-      userName,
-      email,
-      password,
-      confirmPassword,
-      country
+      formData.userName,
+      formData.email,
+      formData.password,
+      formData.confirmPassword,
+      formData.country
     );
     if (Object.keys(errors).length > 0) {
       setErrorMessages(errors);
     } else {
-      setUserName("");
-      setEmail("");
-      setPassword("");
-      setConfirmPassword("");
-      setCountry("");
+      setFormData(INITIAL_STATE);
       navigator("/success");
     }
   }
@@ -63,11 +70,12 @@ function SignupForm() {
             <div className="input_container">
               <label className="label">Username:</label>
               <input
+                name="userName"
                 className="input"
                 type="text"
-                value={userName}
+                value={formData.userName}
                 placeholder="Enter username"
-                onChange={(e) => setUserName(e.target.value)}
+                onChange={handleInputChange}
               />
               {errorMesssages.userName && (
                 <p className="error_message">{errorMesssages.userName}</p>
@@ -76,11 +84,12 @@ function SignupForm() {
             <div className="input_container">
               <label className="label">Email:</label>
               <input
+                name="email"
                 className="input"
                 type="text"
-                value={email}
+                value={formData.email}
                 placeholder="Enter Email"
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={handleInputChange}
               />
               {errorMesssages.email && (
                 <p className="error_message">{errorMesssages.email}</p>
@@ -89,11 +98,12 @@ function SignupForm() {
             <div className="input_container">
               <label className="label">Select a Country:</label>
               <input
+                name="country"
                 type="text"
                 className="input"
-                value={country}
+                value={formData.country}
                 placeholder="Search for a country..."
-                onChange={(e) => setCountry(e.target.value)}
+                onChange={handleInputChange}
               />
               <select>
                 {countries.map((c, index) => (
@@ -108,11 +118,12 @@ function SignupForm() {
             <div className="input_container">
               <label className="label">Password:</label>
               <input
+                name="password"
                 className="input"
                 type="password"
-                value={password}
+                value={formData.password}
                 placeholder="Enter Password"
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={handleInputChange}
               />
               {errorMesssages.password && (
                 <p className="error_message">{errorMesssages.password}</p>
@@ -121,11 +132,12 @@ function SignupForm() {
             <div className="input_container">
               <label className="label">Confirm Password:</label>
               <input
+                name="confirmPassword"
                 className="input"
                 type="password"
-                value={confirmPassword}
+                value={formData.confirmPassword}
                 placeholder="Enter Confirm Password"
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={handleInputChange}
               />
               {errorMesssages.confirmPassword && (
                 <p className="error_message">
